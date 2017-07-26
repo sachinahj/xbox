@@ -5,7 +5,7 @@
   <title>Title of the document</title>
 </head>
 
-<body>
+<body style="padding: 2rem">
   <h1>Xbox Notifier</h1>
   <div>
     <input type="checkbox" id="select_all" name="select_all" value="select_all" />&nbsp;&nbsp;<label for="select_all">Select All</label>
@@ -25,7 +25,7 @@
       console.log("friends", friends);
 
       const html = friends.map(friend => {
-        return `<li><input type="checkbox" id="${friend.id}" name="friend[]" value="${friend.id}" ${friend.following ? "checked" : ""}/>&nbsp;&nbsp;<label for="${friend.id}">${friend.gamertag}&nbsp;${friend.following ? "(following)" : ""}</label></li>`
+        return `<li><input type="checkbox" id="${friend.id}" name="friend[]" value="${friend.id}" ${friend.following ? "checked" : ""}/>&nbsp;&nbsp;<label for="${friend.id}">${friend.gamertag}&nbsp;${friend.following ? "(*)" : ""}</label></li>`
       });
 
       document.getElementById("select_all").checked = friends.every(friend => friend.following);
