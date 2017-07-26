@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Title of the document</title>
+</head>
+
+<body>
+  <h1>Xbox Notifier</h1>
+  <div>
+    <input type="checkbox" id="select_all" name="select_all" value="select_all" />&nbsp;&nbsp;<label for="select_all">Select All</label>
+  </div>
+  <form action='/follow' method='post'>
+    <ul id="friends" style="list-style-type: none; padding: 0">
+    </ul>
+    <button id="submit" type="submit">Update</button>
+  </form>
+
+  <script>
+    fetch('/friends').then(function(response) {
+      console.log("response", response);
+      return response.json();
+    }).then(function(friends) {
+      console.log("friends", friends);
+
+      const html = friends.map(friend => {
+        return `<li><input type="checkbox" id="${friend.id}" name="friend[]" value="${friend.id}" ${friend.following ? "checked" : ""}/>&nbsp;&nbsp;<label for="${friend.id}">${friend.gamertag}</label></li>`
+      });
+
+      document.getElementById("select_all").checked = friends.every(friend => friend.following);
+      document.getElementById("friends").innerHTML = html.join("");
+
+      document.onclick = function (event) {
+
+        if (event.target.name == "select_all") {
+          if (event.target.checked) {
+            document.querySelectorAll("input[name='friend[]']").forEach(input => input.checked = true);
+          } else {
+            document.querySelectorAll("input[name='friend[]']").forEach(input => input.checked = false);
+          }
+        }
+
+        if (event.target.name == "friend[]") {
+          if (document.querySelectorAll("input[name='friend[]']:checked").length == friends.length) {
+            document.getElementById("select_all").checked = true;
+          } else {
+            document.getElementById("select_all").checked = false;
+          }
+        }
+      }
+    });
+
+
+
+  </script>
+</body>
+
+</html>
