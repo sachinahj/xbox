@@ -18,7 +18,6 @@
 
   <script>
     fetch('/friends').then(function(response) {
-      console.log("response", response);
       return response.json();
     }).then(function(friends) {
       console.log("friends", friends);
@@ -49,9 +48,6 @@
         }
       }
     });
-
-
-
   </script>
 </body>
 
