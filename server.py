@@ -36,7 +36,8 @@ def follow_friends():
 
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', port = 3000)
-#
+
+
 # response = requests.get("https://xboxapi.com/v2/{}/presence".format(XUID), headers=HEADERS)
 # data = json.loads(response.content)
 # state = data["state"]

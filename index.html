@@ -17,13 +17,15 @@
   </form>
 
   <script>
-    fetch('/friends').then(function(response) {
+    fetch('/friends')
+    .then(function(response) {
       return response.json();
-    }).then(function(friends) {
+    })
+    .then(function(friends) {
       console.log("friends", friends);
 
       const html = friends.map(friend => {
-        return `<li><input type="checkbox" id="${friend.id}" name="friend[]" value="${friend.id}" ${friend.following ? "checked" : ""}/>&nbsp;&nbsp;<label for="${friend.id}">${friend.gamertag}</label></li>`
+        return `<li><input type="checkbox" id="${friend.id}" name="friend[]" value="${friend.id}" ${friend.following ? "checked" : ""}/>&nbsp;&nbsp;<label for="${friend.id}">${friend.gamertag}&nbsp;${friend.following ? "(following)" : ""}</label></li>`
       });
 
       document.getElementById("select_all").checked = friends.every(friend => friend.following);
