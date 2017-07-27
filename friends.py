@@ -1,17 +1,30 @@
 import config
 import json
 import requests
-import threading
 from twilio.rest import Client
 
 XUID = config.xuid
 HEADERS = {'X-AUTH': config.xboxApiToken}
-client = Client(config.accountSid, config.authToken)
+client = Client(config.twilioAccountSID, config.twilioAuthToken)
+
+class Friend:
+    def __init__(self, friend_raw):
+        self.id = friend_raw["id"]
+        self.gamertag = friend_raw["Gamertag"]
+        self.account_tier = friend_raw["AccountTier"]
+        self.following = False
+        self.online = None
+
+    def dump(self):
+        return {
+            "id": self.id,
+            "gamertag": self.gamertag,
+            "following": self.following,
+        }
 
 class Friends:
-    def __init__(self, me_raw = None, friends_raw = []):
+    def __init__(self):
         self.friends = []
-        self.populate()
 
     def populate(self):
         print("populating!")
@@ -25,17 +38,27 @@ class Friends:
             response = requests.get("https://xboxapi.com/v2/{}/friends".format(XUID), headers=HEADERS)
             if response.status_code == requests.codes.ok:
                 friends_raw = json.loads(response.content)
-                self.friends = list(map(lambda friend: Friend(friend), friends_raw))
-                self.friends.insert(0, Friend(me_raw))
+
+                follow_list = list(map(lambda friend: friend.id, filter(lambda friend: friend.following == True, self.friends)))
+                print("follow_list", follow_list)
+
+                def fn(friend):
+                    f = Friend(friend)
+                    if f.id in follow_list:
+                        f.following = True
+                    return f
+
+                friends_raw.insert(0, me_raw)
+                self.friends = list(map(fn, friends_raw))
                 print("succesfully done populating!")
 
-    def get_all(self):
+    def all(self):
         return self.friends
 
-    def get_gold(self):
+    def gold(self):
         return list(filter(lambda friend: friend.account_tier == "Gold", self.friends))
 
-    def update_follow(self, follow_list):
+    def follow(self, follow_list):
         def update(friend):
             if str(friend.id) in follow_list:
                 friend.following = True
@@ -53,7 +76,7 @@ class Friends:
             message = client.messages.create(to="+12252876416", from_="+13237468466", body=body)
             print(body)
 
-        for friend in self.get_gold():
+        for friend in self.gold():
             if (friend.following == True):
                 response = requests.get("https://xboxapi.com/v2/{}/presence".format(friend.id), headers=HEADERS)
                 if response.status_code == requests.codes.ok:
@@ -70,20 +93,3 @@ class Friends:
                         text(friend)
 
                     friend.online = online
-
-        threading.Timer(10, self.notify).start()
-
-class Friend:
-    def __init__(self, friend_raw):
-        self.id = friend_raw["id"]
-        self.gamertag = friend_raw["Gamertag"]
-        self.account_tier = friend_raw["AccountTier"]
-        self.following = False
-        self.online = None
-
-    def dump(self):
-        return {
-            "id": self.id,
-            "gamertag": self.gamertag,
-            "following": self.following,
-        }
