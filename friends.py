@@ -4,13 +4,30 @@ import requests
 import threading
 from twilio.rest import Client
 
+XUID = config.xuid
 HEADERS = {'X-AUTH': config.xboxApiToken}
 client = Client(config.accountSid, config.authToken)
 
 class Friends:
-    def __init__(self, me_raw, friends_raw):
-        self.friends = list(map(lambda friend: Friend(friend), friends_raw))
-        self.friends.insert(0, Friend(me_raw))
+    def __init__(self, me_raw = None, friends_raw = []):
+        self.friends = []
+        self.populate()
+
+    def populate(self):
+        print("populating!")
+        response = requests.get("https://xboxapi.com/v2/accountxuid", headers=HEADERS)
+        if response.status_code == requests.codes.ok:
+            me_raw = json.loads(response.content)
+            me_raw["id"] = me_raw["xuid"]
+            me_raw["Gamertag"] = me_raw["gamertag"]
+            me_raw["AccountTier"] = "Gold"
+
+            response = requests.get("https://xboxapi.com/v2/{}/friends".format(XUID), headers=HEADERS)
+            if response.status_code == requests.codes.ok:
+                friends_raw = json.loads(response.content)
+                self.friends = list(map(lambda friend: Friend(friend), friends_raw))
+                self.friends.insert(0, Friend(me_raw))
+                print("succesfully done populating!")
 
     def get_all(self):
         return self.friends
@@ -29,6 +46,7 @@ class Friends:
         self.friends = list(map(update, self.friends))
 
     def notify(self):
+        print("notifying!")
 
         def text(friend):
             body ="{} is now online!".format(friend.gamertag)
@@ -38,7 +56,7 @@ class Friends:
         for friend in self.get_gold():
             if (friend.following == True):
                 response = requests.get("https://xboxapi.com/v2/{}/presence".format(friend.id), headers=HEADERS)
-                if (response.status == 200):
+                if response.status_code == requests.codes.ok:
                     presence = json.loads(response.content)
                     online = True if presence["state"] == "Online" else False
 
@@ -53,7 +71,7 @@ class Friends:
 
                     friend.online = online
 
-        threading.Timer(60, self.notify).start()
+        threading.Timer(10, self.notify).start()
 
 class Friend:
     def __init__(self, friend_raw):

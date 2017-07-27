@@ -1,24 +1,13 @@
-import config
-
-XUID = config.xuid
-HEADERS = {'X-AUTH': config.xboxApiToken}
-
 import json
 import requests
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, render_template, redirect, request
 from friends import Friends
 
-response = requests.get("https://xboxapi.com/v2/accountxuid", headers=HEADERS)
-me_raw = json.loads(response.content)
-me_raw["id"] = me_raw["xuid"]
-me_raw["Gamertag"] = me_raw["gamertag"]
-me_raw["AccountTier"] = "Gold"
-
-response = requests.get("https://xboxapi.com/v2/{}/friends".format(XUID), headers=HEADERS)
-friends_raw = json.loads(response.content)
-friends = Friends(me_raw, friends_raw)
-
 app = Flask(__name__, template_folder='.')
+sched = BackgroundScheduler()
+friends = Friends()
+
 @app.route("/")
 def index():
     return render_template('index.html')
@@ -35,4 +24,11 @@ def follow_friends():
 
 if __name__ == '__main__':
     friends.notify()
+
+    @sched.scheduled_job('cron', hour="*", minute="5")
+    def populate():
+        friends.populate()
+
+    sched.start()
+
     app.run(host = '0.0.0.0', port = 3000, threaded=True)
