@@ -5,7 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, render_template, redirect, request
 from friends import Friends
 
-app = Flask(__name__, template_folder='.')
+app = Flask(__name__, template_folder='templates')
 sched = BackgroundScheduler()
 friends = Friends()
 
@@ -26,6 +26,7 @@ def follow_friends():
         return ('', requests.codes.ok)
     else:
         return ('', requests.codes.unauthorized)
+
 if __name__ == '__main__':
     friends.populate()
     friends.notify()
