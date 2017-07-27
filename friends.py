@@ -20,6 +20,7 @@ class Friend:
             "id": self.id,
             "gamertag": self.gamertag,
             "following": self.following,
+            "online": self.online,
         }
 
 class Friends:

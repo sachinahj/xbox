@@ -23,10 +23,12 @@ def follow_friends():
     if hashlib.sha224(secret.encode('utf-8')).hexdigest() == "66de1a3afbebba2648fb742e0385e4e998d354aab823e2bcd2f6a2e0":
         follow_list = request.form.getlist('friend[]')
         friends.follow(follow_list)
-    return redirect("/")
-
+        return ('', requests.codes.ok)
+    else:
+        return ('', requests.codes.unauthorized)
 if __name__ == '__main__':
     friends.populate()
+    friends.notify()
 
     @sched.scheduled_job('cron', minute="*")
     def notify():

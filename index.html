@@ -3,20 +3,33 @@
 
 <head>
   <title>Xbox</title>
+  <style>
+    .follow:after {
+      content: "*";
+      margin-left: 5px;
+    }
+    .follow.green {
+      color: green;
+    }
+    .follow.red {
+      color: red;
+    }
+  </style>
 </head>
 
 <body style="padding: 2rem">
   <h1>Xbox Notifier</h1>
   <div>
-    <input type="checkbox" id="select_all" name="select_all" value="select_all" />&nbsp;&nbsp;<label for="select_all">Select All</label>
+    <input type="checkbox" id="select_all" name="select_all" value="select_all" />
+    <label for="select_all">Select All</label>
   </div>
   <form id="follow-form">
     <ul id="friends" style="list-style-type: none; padding: 0">
     </ul>
-
-    <input id="secret" type="text" placeholder="secret" />
-    <button id="submit" type="submit">Update</button>
   </form>
+
+  <input id="secret" type="text" placeholder="secret" />
+  <button id="submit">Update</button>
 
   <script>
     fetch('/friends')
@@ -26,7 +39,10 @@
     .then(function(friends) {
 
       const html = friends.map(friend => {
-        return `<li><input type="checkbox" id="${friend.id}" name="friend[]" value="${friend.id}" ${friend.following ? "checked" : ""}/>&nbsp;&nbsp;<label for="${friend.id}">${friend.gamertag}&nbsp;${friend.following ? "(*)" : ""}</label></li>`
+        return `<li>
+          <input type="checkbox" id="${friend.id}" name="friend[]" value="${friend.id}" ${friend.following ? "checked" : ""}/>
+          <label class="${friend.following ? "follow" : ""} ${friend.online ? "green" : "red"}" for="${friend.id}">${friend.gamertag}</label>
+        </li>`
       });
 
       document.getElementById("select_all").checked = friends.every(friend => friend.following);
@@ -56,8 +72,12 @@
         const secret = document.getElementById("secret").value;
         fetch("/follow", {
           method: "POST",
+          redirect: "follow",
           headers: {"S-AUTH": secret},
           body: form
+        })
+        .then(response => {
+          location.reload();
         });
       }
     });
