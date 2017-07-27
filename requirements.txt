@@ -1,4 +1,4 @@
-twilio==6.4.3
+APScheduler==3.3.1
 requests==2.18.1
+twilio==6.4.3
 Flask==0.12.2
-apscheduler==3.3.1
