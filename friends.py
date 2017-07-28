@@ -3,9 +3,9 @@ import json
 import requests
 from twilio.rest import Client
 
-XUID = config.xuid
-HEADERS = {'X-AUTH': config.xboxApiToken}
-client = Client(config.twilioAccountSID, config.twilioAuthToken)
+XUID = config.xbox_xuid
+HEADERS = {'X-AUTH': config.xbox_api_token}
+client = Client(config.twilio_account_sid, config.twilio_auth_token)
 
 class Friend:
     def __init__(self, friend_raw):
@@ -74,7 +74,7 @@ class Friends:
 
         def text(friend):
             body ="{} is now online!".format(friend.gamertag)
-            message = client.messages.create(to="+12252876416", from_="+13237468466", body=body)
+            message = client.messages.create(to=config.twilio_phone_to, from_=config.twilio_phone_from, body=body)
             print(body)
 
         for friend in self.gold():
