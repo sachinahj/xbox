@@ -8,7 +8,7 @@ Web app that can notify you through SMS when your friends come online. Choose wh
 
 ## Developers
 #### Install
-Uses Python 2.7 and PIP
+Uses Python 2.7 and PIP 9
 
     git clone https://github.com/sachinahj/xbox.git
     cd xbox/
