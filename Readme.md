@@ -17,6 +17,9 @@ Uses Python 2.7 and PIP 9
 Update config.py with valid configurations
 
     pip install -r requirements.txt
+
+May need to use 'sudo' to install requirements
+
     python server.py
 
 Navigate to http://localhost:3000/
