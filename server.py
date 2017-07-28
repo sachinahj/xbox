@@ -31,7 +31,7 @@ if __name__ == '__main__':
     friends.populate()
     friends.notify()
 
-    @sched.scheduled_job('cron', minute="*")
+    @sched.scheduled_job('cron', minute="*/5")
     def notify():
         friends.notify()
 
